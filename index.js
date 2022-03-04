@@ -1,44 +1,61 @@
 const squares = document.querySelectorAll('.square');
 const mole = document.querySelector('.mole');
-let randomNum = 0;
-// let num = showMole.randomNum;
-
-let scoreHere = 0;
 let score = document.querySelector('#score');
-console.log('score', score)
-let timeLeft = document.querySelector('#timeLeft').innerText;
-console.log('timeleft', timeLeft);
+let timeLeft = document.querySelector('#timeLeft');
 
-function showMole() {
-    randomNum = Math.floor(Math.random() * 9) + 1;
-    console.log(randomNum);
-    console.log(squares)
+let position;
+let shouldStartGame = false;
+
+let countDownTimerId;
+let currentTime = 20;
+let timerId = null;
+let points = 0;
+
+timeLeft.innerText = currentTime;
+
+function generateMole() {
+    squares.forEach(square => {
+        square.classList.remove('mole');
+    })
+    let randomNum = Math.floor(Math.random() * 9) + 1;
     squares[randomNum - 1].classList.add('mole')
-    // console.log('nuim', num);
-    // return num = randomNum;
+    position = randomNum;
 }
 
 function clickMole() {
-    let sq = document.querySelector('.mole')
-    console.log(sq);
-    sq.addEventListener('click', () => {
-        squares[randomNum - 1].classList.remove('mole');
-        scoreHere++;
-        score.innerText = scoreHere;
-        console.log('score here', score)
-        showMole();
+    squares.forEach(square => {
+        square.addEventListener('click', () => {
+            if (square.id == position) {
+                points++;
+                score.innerText = points;
+            }
+        })
     })
 }
 
-function game() {
-    showMole();
-    clickMole();
-
+function randomizePosition() {
+    timerId = setInterval(generateMole, 1000);
 }
 
+function countDown() {
+    currentTime--;
+    timeLeft.innerText = currentTime;
 
-// mole.addEventListener('click', () => {
-//     console.log('elo');
-// })
+    if (currentTime <= 0) {
+        clearInterval(countDownTimerId)
+        clearInterval(timerId)
+        alert(`Game over! You got ${points} points`);
+    }
+}
 
-game();
+function initializeGame() {
+    shouldStartGame = true;
+
+    if (shouldStartGame === true) {
+        countDownTimerId = setInterval(countDown, 1000);
+        countDown();
+    }
+
+    randomizePosition();
+    clickMole();
+}
